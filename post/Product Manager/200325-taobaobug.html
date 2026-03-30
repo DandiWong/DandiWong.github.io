@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>产品思考 Vol.06 | 从淘宝 APP Bug 反推可能性 | 九言阁</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="keywords" content="产品经理,阿九,小九,王小九,蜜淘网,CN海淘,QQ浏览器,知乎,简书,交互设计师,蘑菇街,美丽说,美丽联合,淘世界,九爷,九神,九哥,Dandi,Scrum Master,Agile Coach,敏捷,敏捷教练">
+<meta name="description" content="人难得能做到两件事，一件是承认事实的发生，一件是允许他人的存在。这是阿九的个人博客。">
+<meta name="baidu-site-verification" content="j56pAVq7lE" />
+<meta name="description" content="从3月24日晚间到25日上午，有许多 iPhone 用户惊奇的发现，淘宝 APP 启动后随之被锁定在一个提示内测版本已过期的 Alert 面前，完全无法进入主界面使用。一时网上说法纷纭，甚至连“程序员报复写的 bug”的说法都冒了出来，但是笔者感觉创造这个说法的人可能连前后端都分不清楚，闲来无事就凭借目前有限的已知信息来推导一下问题可能出在哪儿。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="产品思考 Vol.06 | 从淘宝 APP Bug 反推可能性">
+<meta property="og:url" content="http://www.dandi.me/post/Product%20Manager/200325-taobaobug">
+<meta property="og:site_name" content="九言阁">
+<meta property="og:description" content="从3月24日晚间到25日上午，有许多 iPhone 用户惊奇的发现，淘宝 APP 启动后随之被锁定在一个提示内测版本已过期的 Alert 面前，完全无法进入主界面使用。一时网上说法纷纭，甚至连“程序员报复写的 bug”的说法都冒了出来，但是笔者感觉创造这个说法的人可能连前后端都分不清楚，闲来无事就凭借目前有限的已知信息来推导一下问题可能出在哪儿。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.dandi.me/post/Product%20Manager/200325-taobaobug/1.jpg">
+<meta property="og:image" content="http://www.dandi.me/post/Product%20Manager/200325-taobaobug/2.jpg">
+<meta property="og:image" content="http://www.dandi.me/post/Product%20Manager/200325-taobaobug/3.jpg">
+<meta property="og:image" content="http://www.dandi.me/post/Product%20Manager/200325-taobaobug/4.jpg">
+<meta property="article:published_time" content="2020-03-25T10:20:50.000Z">
+<meta property="article:modified_time" content="2022-01-22T16:27:32.000Z">
+<meta property="article:author" content="Dandi Wong">
+<meta property="article:tag" content="产品设计">
+<meta property="article:tag" content="淘宝">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.dandi.me/post/Product%20Manager/200325-taobaobug/1.jpg">
+<meta name="twitter:creator" content="@SitonW">
+<link rel="publisher" href="siton.w@gmail.com">
+  
+    <link rel="alternative" href="/atom.xml" title="九言阁" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+<!--
+  <link href="http://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+-->
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+<!--
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', '[object Object]']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+-->
+
+<!-- 添加Google Analytics for ajiu.me的代码 -->
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+    ga('create', 'UA-54510229-1', 'auto');
+    ga('send', 'pageview');
+    
+</script>
+
+<!-- 添加Google Analytics for isiton.me的代码 -->
+<!--
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+    ga('create', 'UA-54375345-1', 'auto');
+    ga('send', 'pageview');
+    
+</script>
+-->
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">九言阁</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">人难得能做到两件事，一件是承认事实的发生，一件是允许他人的存在。</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/books">Books</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.dandi.me"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Product Manager/200325-taobaobug" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/post/Product Manager/200325-taobaobug.html" class="article-date">
+  <time datetime="2020-03-25T10:20:50.000Z" itemprop="datePublished">3月 25 2020</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Product-Manager/">Product Manager</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      产品思考 Vol.06 | 从淘宝 APP Bug 反推可能性
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>从3月24日晚间到25日上午，有许多 iPhone 用户惊奇的发现，淘宝 APP 启动后随之被锁定在一个提示内测版本已过期的 Alert 面前，完全无法进入主界面使用。一时网上说法纷纭，甚至连“程序员报复写的 bug”的说法都冒了出来，但是笔者感觉创造这个说法的人可能连前后端都分不清楚，闲来无事就凭借目前有限的已知信息来推导一下问题可能出在哪儿。</p>
+<img src="/post/Product%20Manager/200325-taobaobug/1.jpg" class="">
+
+<a id="more"></a>
+
+<p>这里我会用到一个思维工具叫做“黑箱”，当我们把某个看到了结果也了解了基础环境的事件看做一个对外只能看到输入和输出、中间处理过程不明的盒子的话，这个盒子就叫做黑箱。这种思维工具经常被用在一些推理和验证假设的情况中，如复现事件、案件调查等等。</p>
+<p>那么，这里该如何用黑箱工具来推导问题根源呢？</p>
+<h3 id="已知结果，也就是“输出”部分——Output"><a href="#已知结果，也就是“输出”部分——Output" class="headerlink" title="已知结果，也就是“输出”部分——Output"></a>已知结果，也就是“输出”部分——Output</h3><p> a. iOS 客户端出问题了，Android没问题。<br> b. 不是版本更新之后出现的问题，而是线上版本。<br> c. 提示说3.28过期，本地时间改成3.28后悔提示已停用。<br> d. 官方的 hotfix 是快速关闭 alert 而非阻止其出现。<br> e. 到下午2点半为止依然没有完全修复，启动就闪退。</p>
+<h4 id="业界习惯，也就是“输入”部分——Input"><a href="#业界习惯，也就是“输入”部分——Input" class="headerlink" title="业界习惯，也就是“输入”部分——Input"></a>业界习惯，也就是“输入”部分——Input</h4><p> z. MVC或者MVVM设计会在后台控制客户端的某些功能的开启和关闭。<br> y. 公司为了统计数据的准确性，时间等属性都会以应用服务器端为准。<br> x. 大公司都会有完善的代码审计、自动化测试与安全审计等环节。</p>
+<h4 id="推论："><a href="#推论：" class="headerlink" title="推论："></a>推论：</h4><ol>
+<li>程序员复仇论在代码审计环节就站不住脚，功能和意义不明的代码在 Review Meeting 上就会直接被干掉。</li>
+<li>改了系统本地时间可以改变其提示，说明此组件对时间属性的权限是继承系统本身的，因为如果是APP自己的私有组件的话一定是会以服务器时间（至少以运营后台手动设定的时间）为准。</li>
+<li>由12可以得到，这个组件应该是版本更新相关组件。而由「内测版本」等相关内容来看，很有可能是用了 testflight 的 SDK 并且被发布到线上了。这也可以解释为什么后续的修复措施都cover不住，因为按权限管理的设计这个组件的权限等级是要高于其他app内组件的（继承系统层级的权限）。</li>
+</ol>
+<p>但为什么testflight这样一个用于定向发放内测资格的工具的组件会被发布到正式版本？按说最强迫症和洁癖的选择应该是在需要做内测时纳入SDK然后发布，从后台进行对应版本的策略配置，测试通过后再剥离SDK清理冗余代码后进入正常的发布流程。但在敏捷开发大行其道的今天，这样做会明显拖慢发布进度，所以合理推测是为了CI/CD的方便选择了合并性发布、选择性开启，也就是带SDK进入正式发布流程，但是是进入到beta分支还是stage-prod分支看是否有发布前内测的需要，而且进入prod分支后根据渠道号或内部版本号来关闭配置就可以了。曾经iOS还允许第三方更新组件存在的时候还有另外一个好处就是可以方便进行强制更新和紧急修复。</p>
+<p>所以回头来看这次事故，原因有两种可能，一种可能是原本打算做内部新功能测试，但负责配置版本（或版本号）的运营人员粗心大意错误配置到了线上版本上；另一种可能是真的有人在搞事，那也还是版本管理运营与维护人员的责任了，因为只有这个岗位有对应的执行权限，但这种可能性极小，而且要负法律责任的哟朋友，影响一辈子的工作信誉的。问题是到现在为止线上都没有恢复正常，难道testflight 的配置是永久性生效的？还是说负责审核前面那个人的操作的直属主管休假去了……</p>
+<p>但是肯定不是网传的聊天记录中“iOS 程序员小哥留下的隐藏 bug”——推论1已经说过了。</p>
+<img src="/post/Product%20Manager/200325-taobaobug/2.jpg" class="">
+
+<p>可能有伸手党大爷习惯性问一句——别说这些没用的，就告诉我怎么避免这种情况出现！</p>
+<p>我们在对重大决策流程的确认环节一般会做防呆设计，比如重点内容的强调、二次或多次确认等，而为了对抗人的惯性思维和惯性动作也会衍生如错位设计（可选项每次出现时随机调换位置）之类的方案，但这些只适用于重要环节，如果你觉得所有环节都重要都要用上的话，恭喜你，你还得再吃几次别的亏才能克制住自己这些小聪明。</p>
+<img src="/post/Product%20Manager/200325-taobaobug/3.jpg" class="">
+
+<img src="/post/Product%20Manager/200325-taobaobug/4.jpg" class="">
+
+<p>最后，在安全领域有一句话叫薄弱的环节永远都是人。各种产品的交互设计除了考虑人的「正向行为习惯」以外，也经常要在「对抗不良习惯」上做很多考虑，只是对于用户产品很多时候没有所谓的「不良习惯」，反倒会被产品经理借以七宗罪和人性的解释用于实现自己的利益目的。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.dandi.me/post/Product%20Manager/200325-taobaobug" data-id="cmndj0qz2001xjaqthh381uru" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E4%BA%A7%E5%93%81%E8%AE%BE%E8%AE%A1/" rel="tag">产品设计</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B7%98%E5%AE%9D/" rel="tag">淘宝</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/post/Reading/200323-ReadingVol01-ChristelPetitcollin.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">读书感悟 Vol.01 | 《多向思考者》</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="产品思考 Vol.06 | 从淘宝 APP Bug 反推可能性" data-url="http://www.dandi.me/post/Product%20Manager/200325-taobaobug"></div>
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"isiton"};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- Duoshuo Comment END -->
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Wechat</h3>
+    <div class="widget">
+        <img src="/image/qrcode_for_wxgh_talkto9.jpg">
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/post/Product Manager/200325-taobaobug.html">产品思考 Vol.06 | 从淘宝 APP Bug 反推可能性</a>
+          </li>
+        
+          <li>
+            <a href="/post/Reading/200323-ReadingVol01-ChristelPetitcollin.html">读书感悟 Vol.01 | 《多向思考者》</a>
+          </li>
+        
+          <li>
+            <a href="/post/Agile Coach/190905-AgileVol02.html">敏捷故事Vol.02 | 从复盘谈复盘的重要性</a>
+          </li>
+        
+          <li>
+            <a href="/post/Agile Coach/190901-AgileVol01.html">敏捷故事Vol.01 | 您可别谈什么「敏捷已死」了</a>
+          </li>
+        
+          <li>
+            <a href="/post/Thought/181211-Week50.html">Week50记事</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Agile-Coach/" style="font-size: 12.5px;">Agile Coach</a> <a href="/tags/Chrome/" style="font-size: 10px;">Chrome</a> <a href="/tags/CoffeeScript/" style="font-size: 10px;">CoffeeScript</a> <a href="/tags/Framer-Studio/" style="font-size: 10px;">Framer Studio</a> <a href="/tags/GTD/" style="font-size: 10px;">GTD</a> <a href="/tags/GayScipt/" style="font-size: 10px;">GayScipt</a> <a href="/tags/Javascript/" style="font-size: 10px;">Javascript</a> <a href="/tags/MacBookPro/" style="font-size: 17.5px;">MacBookPro</a> <a href="/tags/OS-X/" style="font-size: 15px;">OS X</a> <a href="/tags/Project-Manager/" style="font-size: 12.5px;">Project Manager</a> <a href="/tags/Scrum-Master/" style="font-size: 12.5px;">Scrum Master</a> <a href="/tags/Vim/" style="font-size: 12.5px;">Vim</a> <a href="/tags/%E4%B9%A0%E6%83%AF%E5%85%BB%E6%88%90/" style="font-size: 10px;">习惯养成</a> <a href="/tags/%E4%BA%A4%E4%BA%92%E8%AE%BE%E8%AE%A1/" style="font-size: 12.5px;">交互设计</a> <a href="/tags/%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86/" style="font-size: 15px;">产品经理</a> <a href="/tags/%E4%BA%A7%E5%93%81%E8%AE%BE%E8%AE%A1/" style="font-size: 10px;">产品设计</a> <a href="/tags/%E5%B7%A5%E5%85%B7%E6%8E%A7/" style="font-size: 12.5px;">工具控</a> <a href="/tags/%E5%BF%83%E7%90%86/" style="font-size: 10px;">心理</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E6%96%B9%E5%BC%8F/" style="font-size: 20px;">思维方式</a> <a href="/tags/%E6%88%90%E9%95%BF/" style="font-size: 12.5px;">成长</a> <a href="/tags/%E6%89%A7%E8%A1%8C%E5%8A%9B/" style="font-size: 10px;">执行力</a> <a href="/tags/%E6%8A%80%E6%9C%AF/" style="font-size: 10px;">技术</a> <a href="/tags/%E6%97%85%E8%A1%8C/" style="font-size: 10px;">旅行</a> <a href="/tags/%E6%97%A5%E6%9C%AC/" style="font-size: 10px;">日本</a> <a href="/tags/%E6%B7%98%E5%AE%9D/" style="font-size: 10px;">淘宝</a> <a href="/tags/%E7%89%88%E6%9D%83%E4%BF%9D%E6%8A%A4/" style="font-size: 10px;">版权保护</a> <a href="/tags/%E7%8E%8B%E8%87%AA%E5%A6%82/" style="font-size: 10px;">王自如</a> <a href="/tags/%E7%94%9F%E6%B4%BB%E6%96%B9%E5%BC%8F/" style="font-size: 10px;">生活方式</a> <a href="/tags/%E7%94%A8%E6%88%B7%E4%BD%93%E9%AA%8C/" style="font-size: 12.5px;">用户体验</a> <a href="/tags/%E7%9F%A5%E4%B9%8E/" style="font-size: 17.5px;">知乎</a> <a href="/tags/%E7%A4%BE%E4%BA%A4%E7%BD%91%E7%BB%9C/" style="font-size: 12.5px;">社交网络</a> <a href="/tags/%E7%AE%80%E4%B9%A6/" style="font-size: 12.5px;">简书</a> <a href="/tags/%E7%BD%97%E6%B0%B8%E6%B5%A9/" style="font-size: 10px;">罗永浩</a> <a href="/tags/%E8%87%AA%E5%BE%8B/" style="font-size: 10px;">自律</a> <a href="/tags/%E8%AE%A4%E7%9F%A5/" style="font-size: 15px;">认知</a> <a href="/tags/%E8%B1%86%E7%93%A3/" style="font-size: 10px;">豆瓣</a> <a href="/tags/%E9%94%A4%E5%AD%90%E6%89%8B%E6%9C%BA/" style="font-size: 10px;">锤子手机</a> <a href="/tags/%E9%AB%98%E6%95%8F%E6%84%9F%E6%80%A7%E6%A0%BC/" style="font-size: 10px;">高敏感性格</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Agile-Coach/">Agile Coach</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Product-Manager/">Product Manager</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Reading/">Reading</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Thought/">Thought</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tools/">Tools</a><span class="category-list-count">7</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Agile-Coach/" rel="tag">Agile Coach</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Chrome/" rel="tag">Chrome</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CoffeeScript/" rel="tag">CoffeeScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Framer-Studio/" rel="tag">Framer Studio</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GTD/" rel="tag">GTD</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GayScipt/" rel="tag">GayScipt</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Javascript/" rel="tag">Javascript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MacBookPro/" rel="tag">MacBookPro</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS-X/" rel="tag">OS X</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Project-Manager/" rel="tag">Project Manager</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scrum-Master/" rel="tag">Scrum Master</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vim/" rel="tag">Vim</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B9%A0%E6%83%AF%E5%85%BB%E6%88%90/" rel="tag">习惯养成</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%A4%E4%BA%92%E8%AE%BE%E8%AE%A1/" rel="tag">交互设计</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86/" rel="tag">产品经理</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%A7%E5%93%81%E8%AE%BE%E8%AE%A1/" rel="tag">产品设计</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7%E6%8E%A7/" rel="tag">工具控</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BF%83%E7%90%86/" rel="tag">心理</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E6%96%B9%E5%BC%8F/" rel="tag">思维方式</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%88%90%E9%95%BF/" rel="tag">成长</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%89%A7%E8%A1%8C%E5%8A%9B/" rel="tag">执行力</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8A%80%E6%9C%AF/" rel="tag">技术</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%85%E8%A1%8C/" rel="tag">旅行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A5%E6%9C%AC/" rel="tag">日本</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%98%E5%AE%9D/" rel="tag">淘宝</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%89%88%E6%9D%83%E4%BF%9D%E6%8A%A4/" rel="tag">版权保护</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%8E%8B%E8%87%AA%E5%A6%82/" rel="tag">王自如</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%94%9F%E6%B4%BB%E6%96%B9%E5%BC%8F/" rel="tag">生活方式</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%94%A8%E6%88%B7%E4%BD%93%E9%AA%8C/" rel="tag">用户体验</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9F%A5%E4%B9%8E/" rel="tag">知乎</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A4%BE%E4%BA%A4%E7%BD%91%E7%BB%9C/" rel="tag">社交网络</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%80%E4%B9%A6/" rel="tag">简书</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%97%E6%B0%B8%E6%B5%A9/" rel="tag">罗永浩</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%87%AA%E5%BE%8B/" rel="tag">自律</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A4%E7%9F%A5/" rel="tag">认知</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B1%86%E7%93%A3/" rel="tag">豆瓣</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%94%A4%E5%AD%90%E6%89%8B%E6%9C%BA/" rel="tag">锤子手机</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AB%98%E6%95%8F%E6%84%9F%E6%80%A7%E6%A0%BC/" rel="tag">高敏感性格</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    <div class="widget tag">
+<h3 class="title">友情链接</h3>
+<ul class="entry">
+    <li><a href="http://www.google.com/" target="_blank" rel="noopener" title="Google">Google</a></li>
+</ul>
+</div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2026 Dandi Wong<br>
+      Powered by <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a>  &&  Hosted by <a href="https://pages.coding.me" target="_blank" rel="noopener" style="font-weight: bold">Coding Pages</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/books" class="mobile-nav-link">Books</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<!--
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+-->
+
+<script src="//lib.sinaapp.com/js/jquery/1.8.3/jquery.min.js"></script>
+
+<!-- 添加百度统计isiton.me的代码 -->
+<script type="text/javascript">
+    var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fe4e122217aeaf9afaac715699c125dc1' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+<!-- 添加百度统计ajiu.me的代码 -->
+<script type="text/javascript">
+    var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F028161d910a04a77c6bc4e56c655ae50' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+<script src="/js/script.js"></script>
+
+
+  </div>
+</body>
+</html>
